@@ -1,0 +1,1561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZeroHour Architecture</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-primary: #050505;
+      --bg-secondary: #111118;
+      --bg-card: #0f0f0f;
+      --bg-card-hover: #141414;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-highlight: rgba(255, 255, 255, 0.4);
+      --border-default: rgba(255, 255, 255, 0.16);
+      --text-primary: #ffffff;
+      --text-secondary: #9C9C9C;
+      --text-muted: #676767;
+      --accent-blue: #2962FF;
+      --accent-purple: #5B4DC7;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    /* ==================== LOGIN PAGE ==================== */
+    .login-page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .login-header h1 {
+      font-size: 24px;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+
+    .login-header h1 span {
+      font-size: 12px;
+      vertical-align: super;
+    }
+
+    .login-header p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .login-card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 40px;
+      width: 100%;
+      max-width: 400px;
+      color: #000;
+    }
+
+    .login-card h2 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .login-card .subtitle {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 30px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: #333;
+    }
+
+    .form-group .input-wrapper {
+      position: relative;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px 40px 12px 14px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+    }
+
+    .form-group .input-icon {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #999;
+      font-size: 16px;
+    }
+
+    .form-group .input-icon.toggle-password {
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .form-group .input-icon.toggle-password:hover {
+      color: #333;
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 14px;
+      background: #1a1a2e;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .login-btn:hover {
+      background: #2a2a4e;
+    }
+
+    .login-footer {
+      position: fixed;
+      bottom: 30px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* ==================== MAIN LAYOUT ==================== */
+    .app-container {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    .app-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 24px 80px;
+    }
+
+    .header-left h1 {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .header-left h1 span {
+      font-size: 10px;
+      vertical-align: super;
+    }
+
+    .header-left p {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .situational-awareness {
+      text-align: right;
+    }
+
+    .situational-awareness .label {
+      font-size: 12px;
+      font-weight: 500;
+      margin-bottom: 2px;
+    }
+
+    .situational-awareness .meta {
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    .awareness-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--accent-purple);
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .awareness-icon svg {
+      width: 24px;
+      height: 24px;
+      stroke: white;
+      fill: none;
+    }
+
+    .awareness-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .profile-dropdown {
+      position: relative;
+    }
+
+    .profile-dropdown .awareness-icon {
+      cursor: pointer;
+    }
+
+    .profile-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      background: var(--bg-card);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 8px;
+      min-width: 150px;
+      padding: 8px 0;
+      display: none;
+      z-index: 100;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .profile-menu.visible {
+      display: block;
+    }
+
+    .profile-menu-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      color: var(--text-secondary);
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+    }
+
+    .profile-menu-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-primary);
+    }
+
+    .profile-menu-item svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      fill: none;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      padding: 20px 80px;
+    }
+
+    /* ==================== DASHBOARD ==================== */
+    .module-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+      margin-bottom: 60px;
+    }
+
+    @media (max-width: 900px) {
+      .module-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .module-card {
+      background: var(--bg-card);
+      background-image: linear-gradient(313.9deg, rgba(255, 255, 255, 0) 17.02%, rgba(255, 255, 255, 0.04) 98.82%);
+      border: 1px solid var(--border-default);
+      border-radius: 20px;
+      padding: 28px;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .module-card:hover {
+      border-color: var(--border-highlight);
+    }
+
+    .module-card.active {
+      border-color: var(--border-highlight);
+    }
+
+    .module-card .arrow-btn {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      width: 28px;
+      height: 28px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .module-card:hover .arrow-btn,
+    .module-card.active .arrow-btn {
+      display: flex;
+    }
+
+    .module-card .arrow-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .module-card .arrow-btn svg {
+      width: 10px;
+      height: 10px;
+      stroke: white;
+      stroke-width: 2;
+      fill: none;
+    }
+
+    .module-card h3 {
+      font-size: 18px;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+
+    .module-card p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .module-card .status-badge {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    .module-card .status-pill {
+      display: inline-block;
+      padding: 6px 14px;
+      background: #1F1F1F;
+      border-radius: 8px;
+      font-size: 11px;
+      color: var(--text-secondary);
+      font-weight: 400;
+      margin-top: 16px;
+    }
+
+    /* Optional Modules */
+    .optional-modules {
+      border-top: 1px solid var(--border-color);
+      padding-top: 30px;
+    }
+
+    .optional-modules h4 {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 400;
+      margin-bottom: 20px;
+    }
+
+    .optional-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 40px;
+    }
+
+    @media (max-width: 900px) {
+      .optional-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+    }
+
+    .optional-item {
+      cursor: pointer;
+    }
+
+    .optional-item .number {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .optional-item h5 {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    /* ==================== DETAIL PAGE ==================== */
+    .detail-page {
+      display: none;
+    }
+
+    .detail-page.active {
+      display: block;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #676767;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 8px 0;
+      margin-bottom: 30px;
+    }
+
+    .back-btn:hover {
+      color: var(--text-primary);
+    }
+
+    .detail-header {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 80px;
+      margin-bottom: 50px;
+      align-items: start;
+    }
+
+    @media (max-width: 1000px) {
+      .detail-header {
+        grid-template-columns: 1fr;
+        gap: 30px;
+      }
+    }
+
+    .detail-header h2 {
+      font-size: 40px;
+      font-weight: 400;
+      margin-bottom: 16px;
+      line-height: 1.2;
+    }
+
+    .detail-header .subtitle {
+      font-size: 18px;
+      color: var(--text-muted);
+    }
+
+    .detail-header .description {
+      font-size: 16px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 24px;
+    }
+
+    /* Filter Pills */
+    .filter-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .filter-pill {
+      padding: 8px 16px;
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      border-radius: 8px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .filter-pill:hover {
+      border-color: rgba(255, 255, 255, 0.7);
+      color: var(--text-primary);
+    }
+
+    .filter-pill.active {
+      background: transparent;
+      color: var(--text-primary);
+      border-color: rgba(255, 255, 255, 0.7);
+    }
+
+    /* Signal Cards */
+    .signals-section {
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .signals-section h4 {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 400;
+      margin-bottom: 20px;
+    }
+
+    .signals-grid {
+      display: flex;
+      gap: 24px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding-bottom: 20px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .signals-grid::-webkit-scrollbar {
+      height: 0;
+      display: none;
+    }
+
+    .signal-card {
+      background: var(--bg-card);
+      background-image: linear-gradient(313.9deg, rgba(255, 255, 255, 0) 17.02%, rgba(255, 255, 255, 0.04) 98.82%);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 24px;
+      min-width: 380px;
+      width: 380px;
+      flex-shrink: 0;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .signal-card:hover {
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .signal-card.highlighted {
+      border-color: var(--border-highlight);
+    }
+
+    .signal-card .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+
+    .signal-card .date {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .signal-card .category {
+      padding: 6px 14px;
+      background: #E1E1E1;
+      border-radius: 8px;
+      font-size: 11px;
+      color: #0f0f0f;
+      font-weight: 500;
+    }
+
+    .signal-card h5 {
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+
+    .signal-card .description {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 20px;
+      flex-grow: 1;
+    }
+
+    .signal-card .divider {
+      height: 1px;
+      background: rgba(255, 255, 255, 0.1);
+      margin-bottom: 20px;
+    }
+
+    /* Trajectory */
+    .trajectory {
+      margin-top: auto;
+    }
+
+    .trajectory-label {
+      font-size: 10px;
+      color: var(--text-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+    }
+
+    .trajectory-track {
+      position: relative;
+      padding: 20px 20px 16px;
+      background: linear-gradient(313.9deg, rgba(255, 255, 255, 0) 17.02%, rgba(255, 255, 255, 0.02) 98.82%), rgba(5, 5, 5, 0.5);
+      border-radius: 12px;
+    }
+
+    /* Horizontal connecting line - gradient fade on edges */
+    .trajectory-line {
+      position: absolute;
+      left: 20px;
+      right: 20px;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0) 100%);
+      top: 52px;
+    }
+
+    .trajectory-steps {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 64px;
+    }
+
+    .trajectory-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      position: relative;
+      height: 100%;
+      justify-content: center;
+    }
+
+    /* Vertical bars - centered on the horizontal line */
+    .trajectory-step .bar {
+      width: 1px;
+      height: 32px;
+      background: rgba(255, 255, 255, 0.2);
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .trajectory-step:nth-child(2) .bar,
+    .trajectory-step:nth-child(4) .bar {
+      background: rgba(255, 255, 255, 0.4);
+    }
+
+    .trajectory-step.active .bar {
+      height: 64px;
+      background: rgba(255, 255, 255, 0.85);
+    }
+
+    .trajectory-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 16px;
+    }
+
+    .trajectory-label-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .trajectory-label-item .label-text {
+      font-size: 9px;
+      color: rgba(255, 255, 255, 0.4);
+      line-height: 1.3;
+    }
+
+    .trajectory-label-item.active .label-text {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .trajectory-label-item .current-marker {
+      font-size: 7px;
+      color: var(--accent-blue);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 4px;
+    }
+
+    /* Footer */
+    .app-footer {
+      text-align: center;
+      padding: 30px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* ==================== ADMIN PANEL ==================== */
+    .admin-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      z-index: 1000;
+    }
+
+    .admin-toggle:hover {
+      border-color: var(--accent-purple);
+    }
+
+    .admin-panel {
+      position: fixed;
+      bottom: 60px;
+      right: 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px;
+      display: none;
+      z-index: 1000;
+      min-width: 280px;
+    }
+
+    .admin-panel.visible {
+      display: block;
+    }
+
+    .admin-panel h3 {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+    }
+
+    .admin-panel select {
+      width: 100%;
+      padding: 10px 12px;
+      margin-bottom: 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .admin-panel button {
+      width: 100%;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      border-radius: 6px;
+      border: none;
+      background: var(--accent-purple);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .admin-panel button:hover {
+      opacity: 0.9;
+    }
+
+    .admin-panel button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .admin-panel button.reset {
+      background: transparent;
+      border: 1px solid #ff4757;
+      color: #ff4757;
+    }
+
+    .admin-panel .status-msg {
+      font-size: 11px;
+      margin-top: 8px;
+      padding: 8px;
+      border-radius: 4px;
+      text-align: center;
+    }
+
+    .admin-panel .status-msg.success {
+      background: rgba(46, 204, 113, 0.2);
+      color: #2ecc71;
+    }
+
+    .admin-panel .status-msg.error {
+      background: rgba(255, 71, 87, 0.2);
+      color: #ff4757;
+    }
+
+    /* Page transitions */
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    /* View transitions */
+    .view {
+      display: none;
+    }
+
+    .view.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== LOGIN PAGE ==================== -->
+  <div id="loginPage" class="page active">
+    <div class="login-page">
+      <div class="login-header">
+        <h1>ZeroHour<span>TM</span> Architecture</h1>
+        <p>Pre-Impact Intelligence Through Signal Convergence</p>
+      </div>
+
+      <div class="login-card">
+        <h2>Sign In</h2>
+        <p class="subtitle">Please enter your credentials to access the system.</p>
+
+        <form id="loginForm">
+          <div class="form-group">
+            <label>Email address</label>
+            <div class="input-wrapper">
+              <input type="email" placeholder="email@example.com" value="demo@zerohour.com">
+              <span class="input-icon">&#9993;</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Password</label>
+            <div class="input-wrapper">
+              <input type="password" id="passwordInput" placeholder="********" value="demo1234">
+              <span class="input-icon toggle-password" onclick="togglePassword()">&#128065;</span>
+            </div>
+          </div>
+
+          <button type="submit" class="login-btn">Sign In</button>
+        </form>
+      </div>
+
+      <div class="login-footer">
+        ZeroHour correlates independent signals to surface exposure before impact.
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MAIN APP ==================== -->
+  <div id="appPage" class="page">
+    <div class="app-container">
+
+      <!-- Header -->
+      <header class="app-header">
+        <div class="header-left">
+          <h1>ZeroHour<span>TM</span> Architecture</h1>
+          <p>Pre-Impact Intelligence Through Signal Convergence</p>
+        </div>
+        <div class="header-right">
+          <div class="situational-awareness">
+            <div class="label">Situational Awareness</div>
+            <div class="meta">Global &bull; Signals assessed: <span id="signalDate">02 Feb 2026</span></div>
+          </div>
+          <div class="profile-dropdown">
+            <div class="awareness-icon" onclick="toggleProfileMenu()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <circle cx="12" cy="12" r="6"/>
+                <circle cx="12" cy="12" r="2"/>
+              </svg>
+            </div>
+            <div class="profile-menu" id="profileMenu">
+              <button class="profile-menu-item" onclick="logout()">
+                <svg viewBox="0 0 24 24" stroke-width="2">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                  <polyline points="16 17 21 12 16 7"/>
+                  <line x1="21" y1="12" x2="9" y2="12"/>
+                </svg>
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Content -->
+      <main class="main-content">
+
+        <!-- Dashboard View -->
+        <div id="dashboardView" class="view active">
+          <div class="module-grid">
+            <div class="module-card" data-module="signal-intelligence">
+              <span class="arrow-btn"><svg viewBox="0 0 10 10"><path d="M1 9L9 1M9 1H3M9 1V7"/></svg></span>
+              <h3>Signal Intelligence Layer</h3>
+              <p>Independent Global Signal Ingestion</p>
+              <span class="status-pill" id="signalStatus" style="display: none;">Multiple signals aligning</span>
+            </div>
+
+            <div class="module-card" data-module="correlation-engine">
+              <span class="arrow-btn"><svg viewBox="0 0 10 10"><path d="M1 9L9 1M9 1H3M9 1V7"/></svg></span>
+              <h3>Correlation & Risk Engine</h3>
+              <p>Cross-Domain Convergence Detection</p>
+            </div>
+
+            <div class="module-card" data-module="exposure-window">
+              <span class="arrow-btn"><svg viewBox="0 0 10 10"><path d="M1 9L9 1M9 1H3M9 1V7"/></svg></span>
+              <h3>Exposure Window Intelligence</h3>
+              <p>Pre-Impact Exposure Window Identification</p>
+            </div>
+
+            <div class="module-card" data-module="decision-access">
+              <span class="arrow-btn"><svg viewBox="0 0 10 10"><path d="M1 9L9 1M9 1H3M9 1V7"/></svg></span>
+              <h3>Decision & Access Layer</h3>
+              <p>Executive-Grade Intelligence Delivery</p>
+            </div>
+          </div>
+
+          <div class="optional-modules">
+            <h4>Optional Overlay Modules</h4>
+            <div class="optional-grid">
+              <div class="optional-item">
+                <div class="number">01</div>
+                <h5>Third-Party Exposure Intelligence</h5>
+              </div>
+              <div class="optional-item">
+                <div class="number">02</div>
+                <h5>Narrative & Reputational Intelligence</h5>
+              </div>
+              <div class="optional-item">
+                <div class="number">03</div>
+                <h5>Legal & Regulatory Escalation Intelligence</h5>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Signal Intelligence Detail -->
+        <div id="signalIntelligenceView" class="view">
+          <button class="back-btn" onclick="navigate('#/dashboard')">
+            <span>&larr;</span> Back
+          </button>
+
+          <div class="detail-header">
+            <div>
+              <h2>Signal Intelligence Layer</h2>
+              <p class="subtitle">Independent Global Signal Ingestion</p>
+            </div>
+            <div>
+              <p class="description">Continuous monitoring of 52 independent global signal classes across legal, cyber, financial, reputational, and third-party domains.</p>
+              <div class="filter-pills">
+                <button class="filter-pill" data-filter="legal">Legal & Regulatory Signals</button>
+                <button class="filter-pill" data-filter="cyber">Cyber & Network Anomalies [+]</button>
+                <button class="filter-pill" data-filter="financial">Financial Stress Indicators</button>
+                <button class="filter-pill" data-filter="corporate">Corporate & Third-Party Behavior [+]</button>
+                <button class="filter-pill" data-filter="openweb">Open-Web & Reputational Precursors</button>
+                <button class="filter-pill active" data-filter="all">All Signals [+]</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="signals-section">
+            <h4>Observed Signals</h4>
+            <div class="signals-grid" id="signalsGrid">
+              <!-- Signals will be populated by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Correlation Engine Detail -->
+        <div id="correlationEngineView" class="view">
+          <button class="back-btn" onclick="navigate('#/dashboard')">
+            <span>&larr;</span> Back
+          </button>
+
+          <div class="detail-header">
+            <div>
+              <h2>Correlation & Risk Engine</h2>
+              <p class="subtitle">Cross-Domain Convergence Detection</p>
+            </div>
+            <div>
+              <p class="description">Evaluates alignment across unrelated signal domains to identify rising exposure probability while suppressing noise.</p>
+              <div class="filter-pills">
+                <button class="filter-pill" data-filter="cyber">Convergence Scoring</button>
+                <button class="filter-pill" data-filter="financial">Temporal Pattern Recognition</button>
+                <button class="filter-pill" data-filter="legal">Escalation Probability Modeling</button>
+                <button class="filter-pill" data-filter="corporate">False-Positive Suppression</button>
+                <button class="filter-pill active" data-filter="all">All Signals</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="signals-section">
+            <h4>Observed Signals</h4>
+            <div class="signals-grid" id="correlationSignals"></div>
+          </div>
+        </div>
+
+        <!-- Exposure Window Detail -->
+        <div id="exposureWindowView" class="view">
+          <button class="back-btn" onclick="navigate('#/dashboard')">
+            <span>&larr;</span> Back
+          </button>
+
+          <div class="detail-header">
+            <div>
+              <h2>Exposure Window Intelligence</h2>
+              <p class="subtitle">Cross-Domain Convergence Detection</p>
+            </div>
+            <div>
+              <p class="description">Identifies time-bounded exposure windows—typically 24-72 hours—before disclosure, escalation, or market reaction.</p>
+              <div class="filter-pills">
+                <button class="filter-pill" data-filter="cyber">Exposure Window Flagging</button>
+                <button class="filter-pill" data-filter="legal">Time-to-Escalation Context</button>
+                <button class="filter-pill" data-filter="corporate">Domain-Level Attribution</button>
+                <button class="filter-pill active" data-filter="all">All Signals</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="signals-section">
+            <h4>Observed Signals</h4>
+            <div class="signals-grid" id="exposureSignals"></div>
+          </div>
+        </div>
+
+        <!-- Decision & Access Detail -->
+        <div id="decisionAccessView" class="view">
+          <button class="back-btn" onclick="navigate('#/dashboard')">
+            <span>&larr;</span> Back
+          </button>
+
+          <div class="detail-header">
+            <div>
+              <h2>Decision & Access Layer</h2>
+              <p class="subtitle">Executive-Grade Intelligence Delivery</p>
+            </div>
+            <div>
+              <p class="description">Surfaces only actionable pre-impact intelligence through controlled access and quiet deployment.</p>
+              <div class="filter-pills">
+                <button class="filter-pill" data-filter="cyber">Exposure Summaries</button>
+                <button class="filter-pill" data-filter="legal">Executive Context</button>
+                <button class="filter-pill" data-filter="financial">Controlled Visibility</button>
+                <button class="filter-pill" data-filter="corporate">No Continuous Alerts</button>
+                <button class="filter-pill active" data-filter="all">All Signals</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="signals-section">
+            <h4>Observed Signals</h4>
+            <div class="signals-grid" id="decisionSignals"></div>
+          </div>
+        </div>
+
+      </main>
+
+      <!-- Footer -->
+      <footer class="app-footer">
+        ZeroHour correlates independent signals to surface exposure before impact.
+      </footer>
+
+    </div>
+  </div>
+
+  <!-- Admin Controls -->
+  <button class="admin-toggle" onclick="toggleAdmin()">Admin</button>
+  <div class="admin-panel" id="adminPanel">
+    <h3>Demo Controls</h3>
+    <select id="scenarioSelect">
+      <option value="cyber_breach_pre_disclosure">Cyber Breach Pre-Disclosure</option>
+      <option value="weaponized_public_narrative">Weaponized Public Narrative</option>
+      <option value="legal_escalation_pre_filing">Legal Escalation Pre-Filing</option>
+      <option value="third_party_exposure_event">Third Party Exposure Event</option>
+    </select>
+    <select id="stateSelect">
+      <option value="normal">Normal</option>
+      <option value="signal_convergence">Signal Convergence</option>
+      <option value="exposure_window_open">Exposure Window Open</option>
+      <option value="escalation_imminent">Escalation Imminent</option>
+    </select>
+    <button id="applyBtn" onclick="applyScenario()">Apply</button>
+    <button class="reset" id="resetBtn" onclick="resetState()">Reset</button>
+
+    <div id="adminStatus"></div>
+  </div>
+
+  <script>
+    const API_BASE = '';
+    const ADMIN_TOKEN = 'DEMO_ADMIN_TOKEN';
+
+    // Toggle password visibility
+    function togglePassword() {
+      const input = document.getElementById('passwordInput');
+      const icon = document.querySelector('.toggle-password');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.innerHTML = '&#128064;'; // Open eye
+      } else {
+        input.type = 'password';
+        icon.innerHTML = '&#128065;'; // Eye with line
+      }
+    }
+
+    let currentScenario = 'cyber_breach_pre_disclosure';
+    let currentState = 'normal';
+    let cachedSignals = [];
+
+    // Fallback signal data (used if API fails)
+    const fallbackSignals = [
+      { date: '4/02/2026', category: 'Cyber & Network Anomalies', title: 'Anomalous Traffic Pattern Detected', description: 'Network activity indicators are beginning to diverge from established baseline behavior across multiple vectors.', trajectory: 'alignment' },
+      { date: '4/02/2026', category: 'Corporate & Third-Party Behavior', title: 'Behavioral Shift Across Dependent Entities', description: 'Multiple third-party entities are exhibiting subtle but correlated changes in activity over a short time window.', trajectory: 'detected' },
+      { date: '5/02/2026', category: 'Cyber & Network Anomalies', title: 'Persistent Network Irregularities Observed', description: 'Repeated low-level anomalies suggest emerging consistency rather than isolated or transient noise.', trajectory: 'alignment' },
+      { date: '5/02/2026', category: 'Cyber & Network Anomalies', title: 'Cross-System Signal Alignment Identified', description: 'Independent network signals that typically fluctuate separately are showing early signs of alignment.', trajectory: 'detected', highlighted: true },
+      { date: '6/02/2026', category: 'Financial Stress Indicators', title: 'Unusual Data Transfer Volumes', description: 'Outbound data volumes exceeding normal thresholds during non-business hours.', trajectory: 'early' },
+      { date: '6/02/2026', category: 'Cyber & Network Anomalies', title: 'Authentication Pattern Deviation', description: 'Login attempts from unexpected geographic regions showing coordinated timing.', trajectory: 'early' }
+    ];
+
+    // Hash-based routing
+    const routes = {
+      '': 'login',
+      '#/login': 'login',
+      '#/dashboard': 'dashboard',
+      '#/signal-intelligence': 'signalIntelligenceView',
+      '#/correlation-engine': 'correlationEngineView',
+      '#/exposure-window': 'exposureWindowView',
+      '#/decision-access': 'decisionAccessView'
+    };
+
+    function navigate(hash) {
+      window.location.hash = hash;
+    }
+
+    function logout() {
+      sessionStorage.removeItem('zerohour_logged_in');
+      navigate('#/login');
+    }
+
+    function toggleProfileMenu() {
+      const menu = document.getElementById('profileMenu');
+      menu.classList.toggle('visible');
+    }
+
+    // Close profile menu when clicking outside
+    document.addEventListener('click', function(e) {
+      const dropdown = document.querySelector('.profile-dropdown');
+      const menu = document.getElementById('profileMenu');
+      if (dropdown && menu && !dropdown.contains(e.target)) {
+        menu.classList.remove('visible');
+      }
+    });
+
+    function handleRoute() {
+      const hash = window.location.hash || '';
+      const route = routes[hash];
+
+      // Check if logged in
+      const isLoggedIn = sessionStorage.getItem('zerohour_logged_in') === 'true';
+
+      if (!isLoggedIn && route !== 'login') {
+        navigate('#/login');
+        return;
+      }
+
+      if (route === 'login') {
+        showPage('loginPage');
+      } else if (route === 'dashboard') {
+        showPage('appPage');
+        showView('dashboardView');
+        loadDashboard();
+      } else if (route) {
+        showPage('appPage');
+        showView(route);
+        loadSignals();
+      } else {
+        // Default to dashboard if logged in
+        if (isLoggedIn) {
+          navigate('#/dashboard');
+        } else {
+          navigate('#/login');
+        }
+      }
+    }
+
+    // Listen for hash changes
+    window.addEventListener('hashchange', handleRoute);
+
+    // Page navigation
+    function showPage(pageId) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(pageId).classList.add('active');
+    }
+
+    function showView(viewId) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.getElementById(viewId).classList.add('active');
+    }
+
+    // Login handling
+    const VALID_CREDENTIALS = {
+      email: 'demo@zerohour.com',
+      password: 'demo1234'
+    };
+
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const email = this.querySelector('input[type="email"]').value;
+      const password = document.getElementById('passwordInput').value;
+
+      if (email === VALID_CREDENTIALS.email && password === VALID_CREDENTIALS.password) {
+        sessionStorage.setItem('zerohour_logged_in', 'true');
+        navigate('#/dashboard');
+      } else {
+        showLoginError('Invalid credentials. Please try again.');
+      }
+    });
+
+    function showLoginError(message) {
+      let errorEl = document.getElementById('loginError');
+      if (!errorEl) {
+        errorEl = document.createElement('div');
+        errorEl.id = 'loginError';
+        errorEl.style.cssText = 'color: #ff4757; font-size: 13px; margin-bottom: 16px; text-align: center;';
+        document.querySelector('.login-btn').insertAdjacentElement('beforebegin', errorEl);
+      }
+      errorEl.textContent = message;
+    }
+
+    // Module card click handling
+    document.querySelectorAll('.module-card').forEach(card => {
+      card.addEventListener('click', function() {
+        const module = this.dataset.module;
+        navigate('#/' + module);
+      });
+    });
+
+    // Load dashboard data
+    async function loadDashboard() {
+      // Update date
+      const now = new Date();
+      document.getElementById('signalDate').textContent = now.toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+      });
+
+      // Fetch current state
+      try {
+        const current = await fetch('/scenario/current').then(r => r.json());
+        currentScenario = current.scenario;
+        currentState = current.state;
+        document.getElementById('scenarioSelect').value = currentScenario;
+        document.getElementById('stateSelect').value = currentState;
+        updateDashboardState();
+      } catch (e) {
+        console.log('Using default state');
+      }
+
+      // Preload signals
+      await loadSignals();
+    }
+
+    function updateDashboardState() {
+      const signalCard = document.querySelector('[data-module="signal-intelligence"]');
+      const statusPill = document.getElementById('signalStatus');
+
+      if (currentState !== 'normal') {
+        signalCard.classList.add('active');
+        statusPill.style.display = 'inline-block';
+        statusPill.textContent = currentState === 'signal_convergence' ? 'Multiple signals aligning' :
+                                 currentState === 'exposure_window_open' ? 'Exposure window detected' :
+                                 'Escalation imminent';
+      } else {
+        signalCard.classList.remove('active');
+        statusPill.style.display = 'none';
+      }
+    }
+
+    // Load signals for detail views from API (with fallback)
+    async function loadSignals() {
+      console.log('Loading signals...');
+      try {
+        const response = await fetch('/exposure/signals');
+        if (!response.ok) throw new Error('API error');
+        const signals = await response.json();
+        if (Array.isArray(signals) && signals.length > 0) {
+          console.log('Signals loaded from API:', signals.length);
+          cachedSignals = signals;
+          renderSignals(signals);
+          return;
+        }
+      } catch (e) {
+        console.log('API unavailable, using fallback data');
+      }
+      // Use fallback data
+      console.log('Using fallback signals:', fallbackSignals.length);
+      cachedSignals = fallbackSignals;
+      renderSignals(fallbackSignals);
+    }
+
+    function renderSignals(signals) {
+      const grids = ['signalsGrid', 'correlationSignals', 'exposureSignals', 'decisionSignals'];
+
+      grids.forEach(gridId => {
+        const grid = document.getElementById(gridId);
+        if (!grid) return;
+
+        grid.innerHTML = signals.map(signal => `
+          <div class="signal-card ${signal.highlighted ? 'highlighted' : ''}">
+            <div class="card-header">
+              <span class="date">${signal.date}</span>
+              <span class="category">${signal.category}</span>
+            </div>
+            <h5>${signal.title}</h5>
+            <p class="description">${signal.description}</p>
+            <div class="divider"></div>
+            <div class="trajectory">
+              <div class="trajectory-label">TRAJECTORY</div>
+              <div class="trajectory-track">
+                <div class="trajectory-line"></div>
+                <div class="trajectory-steps">
+                  <div class="trajectory-step ${signal.trajectory === 'early' ? 'active' : ''}">
+                    <div class="bar"></div>
+                  </div>
+                  <div class="trajectory-step ${signal.trajectory === 'detected' ? 'active' : ''}">
+                    <div class="bar"></div>
+                  </div>
+                  <div class="trajectory-step ${signal.trajectory === 'alignment' ? 'active' : ''}">
+                    <div class="bar"></div>
+                  </div>
+                  <div class="trajectory-step ${signal.trajectory === 'exposure' ? 'active' : ''}">
+                    <div class="bar"></div>
+                  </div>
+                </div>
+                <div class="trajectory-labels">
+                  <div class="trajectory-label-item ${signal.trajectory === 'early' ? 'active' : ''}">
+                    <span class="label-text">Early signals</span>
+                    ${signal.trajectory === 'early' ? '<span class="current-marker">CURRENT</span>' : ''}
+                  </div>
+                  <div class="trajectory-label-item ${signal.trajectory === 'detected' ? 'active' : ''}">
+                    <span class="label-text">Detected</span>
+                    ${signal.trajectory === 'detected' ? '<span class="current-marker">CURRENT</span>' : ''}
+                  </div>
+                  <div class="trajectory-label-item ${signal.trajectory === 'alignment' ? 'active' : ''}">
+                    <span class="label-text">Alignment</span>
+                    ${signal.trajectory === 'alignment' ? '<span class="current-marker">CURRENT</span>' : ''}
+                  </div>
+                  <div class="trajectory-label-item ${signal.trajectory === 'exposure' ? 'active' : ''}">
+                    <span class="label-text">Exposure<br>window</span>
+                    ${signal.trajectory === 'exposure' ? '<span class="current-marker">CURRENT</span>' : ''}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      });
+    }
+
+    // Admin controls
+    function toggleAdmin() {
+      document.getElementById('adminPanel').classList.toggle('visible');
+    }
+
+    function showAdminStatus(message, isSuccess) {
+      const statusEl = document.getElementById('adminStatus');
+      statusEl.className = 'status-msg ' + (isSuccess ? 'success' : 'error');
+      statusEl.textContent = message;
+      setTimeout(() => { statusEl.textContent = ''; statusEl.className = ''; }, 3000);
+    }
+
+    async function applyScenario() {
+      const scenario = document.getElementById('scenarioSelect').value;
+      const state = document.getElementById('stateSelect').value;
+      const applyBtn = document.getElementById('applyBtn');
+
+      console.log('Applying scenario:', scenario, 'state:', state);
+      applyBtn.disabled = true;
+      applyBtn.textContent = 'Applying...';
+
+      try {
+        const response = await fetch('/admin/setScenario', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${ADMIN_TOKEN}`
+          },
+          body: JSON.stringify({ scenario, state })
+        });
+
+        const result = await response.json();
+        console.log('Admin response:', result);
+
+        if (result.success) {
+          currentScenario = scenario;
+          currentState = state;
+          updateDashboardState();
+          // Force reload signals from API
+          await loadSignals();
+          showAdminStatus('Applied: ' + state.replace(/_/g, ' '), true);
+          console.log('Scenario applied successfully');
+        } else {
+          console.error('Failed to apply scenario:', result.error);
+          showAdminStatus('Error: ' + (result.error || 'Unknown'), false);
+        }
+      } catch (e) {
+        console.error('Failed to update scenario', e);
+        showAdminStatus('Failed to connect to server', false);
+      } finally {
+        applyBtn.disabled = false;
+        applyBtn.textContent = 'Apply';
+      }
+    }
+
+    async function resetState() {
+      console.log('Resetting state...');
+      const resetBtn = document.getElementById('resetBtn');
+      resetBtn.disabled = true;
+      resetBtn.textContent = 'Resetting...';
+
+      try {
+        const response = await fetch('/admin/reset', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${ADMIN_TOKEN}`
+          }
+        });
+
+        const result = await response.json();
+        console.log('Reset response:', result);
+
+        if (result.success) {
+          currentScenario = 'cyber_breach_pre_disclosure';
+          currentState = 'normal';
+          document.getElementById('scenarioSelect').value = currentScenario;
+          document.getElementById('stateSelect').value = currentState;
+          updateDashboardState();
+          await loadSignals();
+          showAdminStatus('Reset to normal state', true);
+          console.log('Reset successful');
+        } else {
+          console.error('Failed to reset:', result.error);
+          showAdminStatus('Reset failed', false);
+        }
+      } catch (e) {
+        console.error('Failed to reset', e);
+        showAdminStatus('Failed to connect', false);
+      } finally {
+        resetBtn.disabled = false;
+        resetBtn.textContent = 'Reset';
+      }
+    }
+
+    // Filter category mapping
+    const filterCategories = {
+      'legal': 'Legal & Regulatory Signals',
+      'cyber': 'Cyber & Network Anomalies',
+      'financial': 'Financial Stress Indicators',
+      'corporate': 'Corporate & Third-Party Behavior',
+      'openweb': 'Open-Web & Reputational Precursors',
+      'all': null  // Show all
+    };
+
+    let currentFilter = 'all';
+
+    // Filter pill handling
+    document.querySelectorAll('.filter-pill').forEach(pill => {
+      pill.addEventListener('click', function() {
+        const parent = this.closest('.filter-pills');
+        parent.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+        this.classList.add('active');
+
+        // Get filter from data attribute or text content
+        const filterKey = this.dataset.filter || 'all';
+        currentFilter = filterKey;
+
+        // Filter and render signals
+        filterSignals(filterKey);
+      });
+    });
+
+    function filterSignals(filterKey) {
+      const categoryName = filterCategories[filterKey];
+      let filtered;
+
+      if (!categoryName) {
+        // Show all
+        filtered = cachedSignals;
+      } else {
+        filtered = cachedSignals.filter(s => s.category === categoryName);
+      }
+
+      // If no matches, show all with a message
+      if (filtered.length === 0) {
+        filtered = cachedSignals;
+      }
+
+      renderSignals(filtered);
+    }
+
+    // Update the date display to current date
+    function updateCurrentDate() {
+      const now = new Date();
+      const dateEl = document.getElementById('signalDate');
+      if (dateEl) {
+        dateEl.textContent = now.toLocaleDateString('en-GB', {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric'
+        });
+      }
+    }
+
+    // Initialize on page load
+    updateCurrentDate();
+    handleRoute();
+  </script>
+
+</body>
+</html>
