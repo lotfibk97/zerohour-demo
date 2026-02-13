@@ -1512,14 +1512,7 @@
     }
 
     function renderSignals(signals) {
-      // Only render signal cards in Signal Intelligence view
-      const grids = ['signalsGrid'];
-
-      // Show empty state for other detail pages
-      ['correlationSignals', 'exposureSignals', 'decisionSignals'].forEach(gridId => {
-        const grid = document.getElementById(gridId);
-        if (grid) grid.innerHTML = '';
-      });
+      const grids = ['signalsGrid', 'correlationSignals', 'exposureSignals', 'decisionSignals'];
 
       grids.forEach(gridId => {
         const grid = document.getElementById(gridId);
