@@ -1317,17 +1317,117 @@
 
     let currentScenario = 'cyber_breach_pre_disclosure';
     let currentState = 'normal';
-    let cachedSignals = [];
 
-    // Fallback signal data (used if API fails)
-    const fallbackSignals = [
-      { date: '4/02/2026', category: 'Cyber & Network Anomalies', title: 'Anomalous Traffic Pattern Detected', description: 'Network activity indicators are beginning to diverge from established baseline behavior across multiple vectors.', trajectory: 'alignment' },
-      { date: '4/02/2026', category: 'Corporate & Third-Party Behavior', title: 'Behavioral Shift Across Dependent Entities', description: 'Multiple third-party entities are exhibiting subtle but correlated changes in activity over a short time window.', trajectory: 'detected' },
-      { date: '5/02/2026', category: 'Cyber & Network Anomalies', title: 'Persistent Network Irregularities Observed', description: 'Repeated low-level anomalies suggest emerging consistency rather than isolated or transient noise.', trajectory: 'alignment' },
-      { date: '5/02/2026', category: 'Cyber & Network Anomalies', title: 'Cross-System Signal Alignment Identified', description: 'Independent network signals that typically fluctuate separately are showing early signs of alignment.', trajectory: 'detected', highlighted: true },
-      { date: '6/02/2026', category: 'Financial Stress Indicators', title: 'Unusual Data Transfer Volumes', description: 'Outbound data volumes exceeding normal thresholds during non-business hours.', trajectory: 'early' },
-      { date: '6/02/2026', category: 'Cyber & Network Anomalies', title: 'Authentication Pattern Deviation', description: 'Login attempts from unexpected geographic regions showing coordinated timing.', trajectory: 'early' }
-    ];
+    // ===== LAYER 1: Signal Intelligence — per-category signals =====
+    const signalIntelligenceData = {
+      cyber: [
+        { date: '4/02/2026', category: 'Cyber & Network Anomalies', title: 'Persistent Access Footprint Detected', description: 'Authentication persistence patterns suggest continued access continuity beyond expected session lifecycles, indicating potential long-term foothold behavior.', trajectory: 'alignment' },
+        { date: '4/02/2026', category: 'Cyber & Network Anomalies', title: 'Privileged Credential Drift Observed', description: 'Incremental changes in privileged account usage and token refresh cadence are deviating from historical baseline activity across sensitive systems.', trajectory: 'detected' },
+        { date: '5/02/2026', category: 'Cyber & Network Anomalies', title: 'Data Aggregation Anomaly Emerging', description: 'Uncharacteristic consolidation of structured and unstructured datasets across segmented repositories suggests preparatory data alignment behavior.', trajectory: 'alignment', highlighted: true },
+        { date: '5/02/2026', category: 'Cyber & Network Anomalies', title: 'Outbound Traffic Pattern Compression', description: 'Low-volume, periodic outbound communications exhibit controlled cadence consistency consistent with staged exfiltration sequencing below standard alert thresholds.', trajectory: 'detected' },
+        { date: '6/02/2026', category: 'Cyber & Network Anomalies', title: 'Log Integrity Irregularities Identified', description: 'Minor but persistent inconsistencies in event logging completeness and retention sequencing indicate potential tampering or signal suppression activity.', trajectory: 'early' },
+        { date: '6/02/2026', category: 'Cyber & Network Anomalies', title: 'Disclosure Sensitivity Window Approaching', description: 'Internal incident triage activity and cross-functional consultation patterns suggest emerging alignment around materiality assessment thresholds.', trajectory: 'exposure' }
+      ],
+      corporate: [
+        { date: '4/02/2026', category: 'Corporate & Third-Party Behavior', title: 'Vendor Security Posture Deviation', description: 'External partner telemetry and publicly available indicators suggest divergence from established security posture baselines, increasing downstream exposure sensitivity.', trajectory: 'detected' },
+        { date: '4/02/2026', category: 'Corporate & Third-Party Behavior', title: 'Contractual Liability Alignment Shift', description: 'Recent amendments, clarification requests, or indemnification adjustments indicate evolving risk allocation dynamics within active third-party agreements.', trajectory: 'alignment' },
+        { date: '5/02/2026', category: 'Corporate & Third-Party Behavior', title: 'Counterparty Operational Instability', description: 'Subtle shifts in delivery cadence, staffing patterns, and response latency suggest emerging operational strain within a dependent service provider.', trajectory: 'detected' },
+        { date: '5/02/2026', category: 'Corporate & Third-Party Behavior', title: 'Data Access Scope Expansion', description: 'Incremental increases in third-party data access permissions across interconnected systems indicate expanded exposure surface beyond original operational scope.', trajectory: 'alignment', highlighted: true },
+        { date: '6/02/2026', category: 'Corporate & Third-Party Behavior', title: 'Regulatory Scrutiny of Sector-Adjacent Entity', description: 'Enforcement or inquiry activity targeting a sector-aligned partner increases associative regulatory sensitivity across shared operational domains.', trajectory: 'early' },
+        { date: '6/02/2026', category: 'Corporate & Third-Party Behavior', title: 'Concentration Risk Convergence', description: 'Overlapping dependency across multiple critical workflows is creating elevated single-point exposure to a limited set of external entities.', trajectory: 'exposure' }
+      ],
+      openweb: [
+        { date: '4/02/2026', category: 'Open-Web & Reputational Precursors', title: 'Narrative Velocity Acceleration', description: 'External commentary frequency and thematic repetition are increasing within a compressed timeframe, suggesting emerging amplification dynamics across public channels.', trajectory: 'detected' },
+        { date: '4/02/2026', category: 'Open-Web & Reputational Precursors', title: 'Sentiment Divergence Emerging', description: 'Stakeholder sentiment across analyst, media, and public domains is beginning to diverge from historical stability baselines, indicating potential narrative polarization.', trajectory: 'alignment' },
+        { date: '5/02/2026', category: 'Open-Web & Reputational Precursors', title: 'Influencer Amplification Alignment', description: 'High-reach accounts and sector-adjacent commentators are exhibiting synchronized topic engagement patterns, increasing probability of narrative escalation.', trajectory: 'detected', highlighted: true },
+        { date: '5/02/2026', category: 'Open-Web & Reputational Precursors', title: 'Headline Framing Precursor Signals', description: 'Language patterns within early coverage and commentary reflect framing structures historically associated with reputational inflection points.', trajectory: 'alignment' },
+        { date: '6/02/2026', category: 'Open-Web & Reputational Precursors', title: 'Information Asymmetry Exposure Window', description: 'Public speculation and inquiry activity are accelerating ahead of confirmed disclosure timelines, increasing vulnerability to misaligned narrative formation.', trajectory: 'exposure' },
+        { date: '6/02/2026', category: 'Open-Web & Reputational Precursors', title: 'Cross-Platform Convergence Detected', description: 'Independent discourse streams across social, financial, and traditional media domains are aligning around overlapping themes within a shortened cycle window.', trajectory: 'early' }
+      ],
+      legal: [
+        { date: '4/02/2026', category: 'Legal & Regulatory Signals', title: 'Regulatory Sensitivity Window Opening', description: 'External regulatory timing cycles combined with sector-specific enforcement activity indicate increased sensitivity to procedural deviations within the current reporting period.', trajectory: 'detected' },
+        { date: '4/02/2026', category: 'Legal & Regulatory Signals', title: 'Internal Control Deviation Identified', description: 'Variance in standard compliance review workflows and documentation routing patterns suggests divergence from established internal control baselines.', trajectory: 'alignment' },
+        { date: '5/02/2026', category: 'Legal & Regulatory Signals', title: 'Documentation Access Pattern Shift', description: 'Elevated access to governance, audit, and policy records has emerged outside of typical review cycles, indicating potential internal review or preparation behavior.', trajectory: 'detected' },
+        { date: '5/02/2026', category: 'Legal & Regulatory Signals', title: 'Cross-Entity Reporting Irregularity', description: 'Minor inconsistencies in interdepartmental reporting cadence and disclosure sequencing are aligning across dependent entities within a compressed timeframe.', trajectory: 'alignment', highlighted: true },
+        { date: '6/02/2026', category: 'Legal & Regulatory Signals', title: 'Escalation Alignment Across Legal & Compliance Domains', description: 'Independent compliance signals—policy review activity, advisory consultations, and documentation adjustments—are converging in a manner consistent with emerging exposure management.', trajectory: 'early' },
+        { date: '6/02/2026', category: 'Legal & Regulatory Signals', title: 'Third-Party Governance Friction Emerging', description: 'Shifts in contractual clarification requests and counterparty communication patterns suggest increasing sensitivity to regulatory or liability alignment.', trajectory: 'exposure' }
+      ],
+      financial: [
+        { date: '4/02/2026', category: 'Financial Stress Indicators', title: 'Liquidity Buffer Compression Detected', description: 'Cash reserve utilization and short-term obligation cadence are narrowing relative to historical operating bands, reducing discretionary maneuverability.', trajectory: 'detected' },
+        { date: '4/02/2026', category: 'Financial Stress Indicators', title: 'Credit Facility Utilization Drift', description: 'Incremental increases in revolving credit draw frequency and duration suggest emerging reliance on short-cycle liquidity support mechanisms.', trajectory: 'alignment' },
+        { date: '5/02/2026', category: 'Financial Stress Indicators', title: 'Counterparty Payment Latency Shift', description: 'Minor but consistent delays in inbound receivables and outbound settlement timing indicate early-stage cash flow friction.', trajectory: 'detected' },
+        { date: '5/02/2026', category: 'Financial Stress Indicators', title: 'Covenant Sensitivity Alignment', description: 'Operating performance metrics are converging toward thresholds commonly associated with covenant scrutiny or lender engagement activity.', trajectory: 'alignment', highlighted: true },
+        { date: '6/02/2026', category: 'Financial Stress Indicators', title: 'Rating & Analyst Tone Deviation', description: 'Subtle shifts in analyst commentary and credit outlook language reflect increased monitoring posture without formal downgrade action.', trajectory: 'early' },
+        { date: '6/02/2026', category: 'Financial Stress Indicators', title: 'Capital Access Volatility Increase', description: 'Market-based capital sensitivity indicators suggest reduced tolerance for refinancing or equity issuance under current volatility conditions.', trajectory: 'exposure' }
+      ]
+    };
+
+    // ===== LAYER 2: Correlation & Risk Engine — per-tab signals =====
+    const correlationData = {
+      cyber: [ // Convergence Scoring
+        { date: '5/02/2026', category: 'Convergence Scoring', title: 'Signal Alignment Across Independent Domains', description: 'Cyber telemetry, authentication drift, and network consistency deviations are aligning within a compressed interval inconsistent with isolated variance behavior.', trajectory: 'alignment' },
+        { date: '5/02/2026', category: 'Convergence Scoring', title: 'Multi-Vector Correlation Threshold Surpassed', description: 'Weighted signal scoring indicates that independent indicators now exceed baseline convergence probability bands, increasing exposure likelihood beyond random coincidence.', trajectory: 'detected', highlighted: true },
+        { date: '6/02/2026', category: 'Convergence Scoring', title: 'Pattern Alignment with Prior Escalation Sequences', description: 'Current signal density and interaction profile exhibit structural similarity to historical pre-escalation cycles observed in prior high-impact events.', trajectory: 'alignment' }
+      ],
+      financial: [ // Temporal Pattern Recognition
+        { date: '4/02/2026', category: 'Temporal Pattern Recognition', title: 'Signal Interval Shortening Detected', description: 'Time between initial anomaly emergence and cross-domain alignment has decreased relative to historical averages, suggesting progression velocity increase.', trajectory: 'detected' },
+        { date: '5/02/2026', category: 'Temporal Pattern Recognition', title: 'Progression Sequence Alignment Identified', description: 'Observed signal behavior aligns with typical escalation pathways: early anomaly → persistence → convergence → exposure window formation.', trajectory: 'alignment' },
+        { date: '6/02/2026', category: 'Temporal Pattern Recognition', title: 'Acceleration Coefficient Elevated', description: 'Temporal compression combined with convergence density increases probability of threshold crossing within a shortened decision window.', trajectory: 'alignment', highlighted: true }
+      ],
+      legal: [ // Escalation Probability Modeling
+        { date: '4/02/2026', category: 'Escalation Probability Modeling', title: 'Exposure Surface Expanding', description: 'Cross-system interaction density suggests growing operational and reputational surface area should escalation proceed.', trajectory: 'alignment' },
+        { date: '5/02/2026', category: 'Escalation Probability Modeling', title: 'Materiality Threshold Approach', description: 'Current alignment metrics indicate proximity to common disclosure, regulatory, or financial sensitivity thresholds.', trajectory: 'detected', highlighted: true },
+        { date: '6/02/2026', category: 'Escalation Probability Modeling', title: 'Containment Window Narrowing', description: 'Escalation modeling suggests diminishing opportunity for internal intervention prior to external visibility.', trajectory: 'exposure' }
+      ],
+      corporate: [ // False-Positive Suppression
+        { date: '4/02/2026', category: 'False-Positive Suppression', title: 'Single-Domain Variance Filtered', description: 'Independent anomaly signals lacking cross-domain interaction were excluded from convergence modeling.', trajectory: 'detected' },
+        { date: '5/02/2026', category: 'False-Positive Suppression', title: 'Coincidence Probability Minimized', description: 'Cross-vector density exceeds stochastic probability thresholds, reducing likelihood of random alignment.', trajectory: 'alignment', highlighted: true },
+        { date: '6/02/2026', category: 'False-Positive Suppression', title: 'Baseline Variance Differentiation Confirmed', description: 'Current signal behavior deviates materially from historical non-escalatory anomaly cycles.', trajectory: 'alignment' }
+      ]
+    };
+
+    // ===== LAYER 3: Exposure Window Intelligence — per-tab signals =====
+    const exposureWindowData = {
+      cyber: [ // Exposure Window Flagging
+        { date: '5/02/2026', category: 'Exposure Window Flagging', title: 'Signal Convergence Threshold Reached', description: 'Multiple low-noise indicators across authentication, privilege behavior, and network telemetry have crossed the correlation density threshold associated with early-stage material exposure.\n\nTrajectory: Early signals → Alignment → Exposure Window (Current)', trajectory: 'exposure' },
+        { date: '5/02/2026', category: 'Exposure Window Flagging', title: 'Cross-Domain Signal Density Rising', description: 'Signal frequency and temporal overlap have increased beyond historical variance bands, indicating coordinated anomaly progression rather than isolated irregularity.\n\nTrajectory: Stable → Divergence → Convergence (Current)', trajectory: 'alignment', highlighted: true },
+        { date: '6/02/2026', category: 'Exposure Window Flagging', title: 'Exposure Window Compression Detected', description: 'The interval between anomaly emergence and alignment has shortened relative to baseline cycles, suggesting accelerated progression toward escalation thresholds.\n\nTrajectory: Normal cadence → Accelerated cadence (Current)', trajectory: 'detected' }
+      ],
+      legal: [ // Time-to-Escalation Context
+        { date: '4/02/2026', category: 'Time-to-Escalation Context', title: 'Estimated Dwell Time Expanding', description: 'Persistence indicators suggest continued internal presence beyond typical short-cycle anomaly windows, increasing the likelihood of lateral or staged progression.\n\nCurrent Dwell Estimate: 9–14 hours', trajectory: 'alignment' },
+        { date: '5/02/2026', category: 'Time-to-Escalation Context', title: 'Escalation Sequence Alignment', description: 'Observed activity reflects early-stage alignment with historical breach progression patterns: foothold → persistence → convergence → materiality assessment.\n\nCurrent Stage: Persistence / Pre-Escalation', trajectory: 'detected', highlighted: true },
+        { date: '6/02/2026', category: 'Time-to-Escalation Context', title: 'Materiality Proximity Narrowing', description: 'Internal signal density and impact surface suggest potential approach toward thresholds commonly associated with regulatory or stakeholder notification considerations.', trajectory: 'exposure' }
+      ],
+      corporate: [ // Domain-Level Attribution
+        { date: '4/02/2026', category: 'Domain-Level Attribution', title: 'Cyber Signal Contribution: 58%', description: 'Authentication drift, privilege behavior shifts, and network beaconing indicators constitute the majority driver of current exposure convergence.', trajectory: 'alignment', highlighted: true },
+        { date: '5/02/2026', category: 'Domain-Level Attribution', title: 'Third-Party Exposure Overlay: 19%', description: 'Dependent entity behavioral irregularities and shared credential pathways increase systemic exposure surface beyond internal perimeter boundaries.', trajectory: 'detected' },
+        { date: '6/02/2026', category: 'Domain-Level Attribution', title: 'Legal Sensitivity Context: Emerging', description: 'While primary exposure remains technical, convergence density suggests potential downstream governance or regulatory sensitivity if escalation continues.', trajectory: 'early' }
+      ]
+    };
+
+    // ===== LAYER 4: Decision & Access Layer — per-tab signals =====
+    const decisionAccessData = {
+      cyber: [ // Exposure Summaries
+        { date: '5/02/2026', category: 'Exposure Summaries', title: 'Operational Risk: Elevated', description: 'Signal convergence suggests increasing likelihood of containment-sensitive cyber escalation with potential cross-domain amplification.', trajectory: 'exposure', highlighted: true },
+        { date: '5/02/2026', category: 'Exposure Summaries', title: 'Disclosure Sensitivity: Emerging', description: 'Progression velocity and dwell time expansion suggest potential approach toward internal materiality evaluation thresholds.', trajectory: 'alignment' },
+        { date: '6/02/2026', category: 'Exposure Summaries', title: 'Recommended Executive Action', description: 'Initiate containment validation review and confirm privileged access integrity within identified trust zones.', trajectory: 'exposure' }
+      ],
+      legal: [ // Executive Context
+        { date: '4/02/2026', category: 'Executive Context', title: 'Potential Operational Disruption', description: 'If current signal convergence continues, containment measures may be required to prevent service interruption or system instability.', trajectory: 'alignment' },
+        { date: '5/02/2026', category: 'Executive Context', title: 'Executive Review Sensitivity', description: 'Escalation beyond current thresholds may require formal internal review and assessment of disclosure obligations.', trajectory: 'exposure', highlighted: true },
+        { date: '6/02/2026', category: 'Executive Context', title: 'Stakeholder Perception Risk', description: 'Delayed containment increases the likelihood of external scrutiny, potentially affecting capital confidence and enterprise valuation.', trajectory: 'exposure' }
+      ],
+      financial: [ // Controlled Visibility
+        { date: '4/02/2026', category: 'Controlled Visibility', title: 'Intelligence Surface Restriction', description: 'Only cross-domain convergence events exceeding material thresholds are surfaced at this layer to prevent operational noise.', trajectory: 'detected' },
+        { date: '5/02/2026', category: 'Controlled Visibility', title: 'Role-Based Disclosure Control', description: 'Exposure summaries are routed selectively based on executive function and domain sensitivity.', trajectory: 'alignment', highlighted: true },
+        { date: '6/02/2026', category: 'Controlled Visibility', title: 'Non-Disruptive Surveillance', description: 'The system operates continuously without alert fatigue, surfacing only convergence-based material intelligence.', trajectory: 'alignment' }
+      ],
+      corporate: [ // No Continuous Alerts
+        { date: '4/02/2026', category: 'No Continuous Alerts', title: 'No Single-Signal Escalation', description: 'Individual anomaly events do not trigger executive escalation unless cross-domain alignment is confirmed.', trajectory: 'detected' },
+        { date: '5/02/2026', category: 'No Continuous Alerts', title: 'Threshold-Gated Intelligence', description: 'Escalation logic requires density, duration, and domain interaction before surfacing at leadership level.', trajectory: 'alignment' },
+        { date: '6/02/2026', category: 'No Continuous Alerts', title: 'Impact-Driven Surfacing', description: 'Only exposure windows with projected enterprise impact are elevated to executive visibility.', trajectory: 'exposure', highlighted: true }
+      ]
+    };
 
     // Hash-based routing
     const routes = {
@@ -1489,85 +1589,74 @@
       }
     }
 
-    // Load signals for detail views from API (with fallback)
-    async function loadSignals() {
-      console.log('Loading signals...');
-      try {
-        const response = await fetch('/exposure/signals');
-        if (!response.ok) throw new Error('API error');
-        const signals = await response.json();
-        if (Array.isArray(signals) && signals.length > 0) {
-          console.log('Signals loaded from API:', signals.length);
-          cachedSignals = signals;
-          renderSignals(signals);
-          return;
-        }
-      } catch (e) {
-        console.log('API unavailable, using fallback data');
-      }
-      // Use fallback data
-      console.log('Using fallback signals:', fallbackSignals.length);
-      cachedSignals = fallbackSignals;
-      renderSignals(fallbackSignals);
+    // Helper: get all signals for a layer data object
+    function getAllLayerSignals(layerData) {
+      return Object.values(layerData).flat();
     }
 
-    function renderSignals(signals) {
-      const grids = ['signalsGrid', 'correlationSignals', 'exposureSignals', 'decisionSignals'];
+    // Load signals for all detail views
+    function loadSignals() {
+      console.log('Loading layer-specific signals...');
+      renderGrid('signalsGrid', getAllLayerSignals(signalIntelligenceData));
+      renderGrid('correlationSignals', getAllLayerSignals(correlationData));
+      renderGrid('exposureSignals', getAllLayerSignals(exposureWindowData));
+      renderGrid('decisionSignals', getAllLayerSignals(decisionAccessData));
+    }
 
-      grids.forEach(gridId => {
-        const grid = document.getElementById(gridId);
-        if (!grid) return;
+    // Render a single grid with given signals
+    function renderGrid(gridId, signals) {
+      const grid = document.getElementById(gridId);
+      if (!grid) return;
 
-        grid.innerHTML = signals.map(signal => `
-          <div class="signal-card ${signal.highlighted ? 'highlighted' : ''}">
-            <div class="card-header">
-              <span class="date">${signal.date}</span>
-              <span class="category">${signal.category}</span>
-            </div>
-            <h5>${signal.title}</h5>
-            <p class="description">${signal.description}</p>
-            <div class="divider"></div>
-            <div class="trajectory">
-              <div class="trajectory-label">TRAJECTORY</div>
-              <div class="trajectory-track">
-                <div class="trajectory-line"></div>
-                <div class="trajectory-steps">
-                  <div class="trajectory-step ${signal.trajectory === 'early' ? 'active' : ''}">
-                    <div class="bar"></div>
-                  </div>
-                  <div class="trajectory-step ${signal.trajectory === 'detected' ? 'active' : ''}">
-                    <div class="bar"></div>
-                  </div>
-                  <div class="trajectory-step ${signal.trajectory === 'alignment' ? 'active' : ''}">
-                    <div class="bar"></div>
-                  </div>
-                  <div class="trajectory-step ${signal.trajectory === 'exposure' ? 'active' : ''}">
-                    <div class="bar"></div>
-                  </div>
+      grid.innerHTML = signals.map(signal => `
+        <div class="signal-card ${signal.highlighted ? 'highlighted' : ''}">
+          <div class="card-header">
+            <span class="date">${signal.date}</span>
+            <span class="category">${signal.category}</span>
+          </div>
+          <h5>${signal.title}</h5>
+          <p class="description">${signal.description.replace(/\n/g, '<br>')}</p>
+          <div class="divider"></div>
+          <div class="trajectory">
+            <div class="trajectory-label">TRAJECTORY</div>
+            <div class="trajectory-track">
+              <div class="trajectory-line"></div>
+              <div class="trajectory-steps">
+                <div class="trajectory-step ${signal.trajectory === 'early' ? 'active' : ''}">
+                  <div class="bar"></div>
                 </div>
-                <div class="trajectory-labels">
-                  <div class="trajectory-label-item ${signal.trajectory === 'early' ? 'active' : ''}">
-                    <span class="label-text">Early signals</span>
-                    ${signal.trajectory === 'early' ? '<span class="current-marker">CURRENT</span>' : ''}
-                  </div>
-                  <div class="trajectory-label-item ${signal.trajectory === 'detected' ? 'active' : ''}">
-                    <span class="label-text">Detected</span>
-                    ${signal.trajectory === 'detected' ? '<span class="current-marker">CURRENT</span>' : ''}
-                  </div>
-                  <div class="trajectory-label-item ${signal.trajectory === 'alignment' ? 'active' : ''}">
-                    <span class="label-text">Alignment</span>
-                    ${signal.trajectory === 'alignment' ? '<span class="current-marker">CURRENT</span>' : ''}
-                  </div>
-                  <div class="trajectory-label-item ${signal.trajectory === 'exposure' ? 'active' : ''}">
-                    <span class="label-text">Exposure<br>window</span>
-                    ${signal.trajectory === 'exposure' ? '<span class="current-marker">CURRENT</span>' : ''}
-                  </div>
+                <div class="trajectory-step ${signal.trajectory === 'detected' ? 'active' : ''}">
+                  <div class="bar"></div>
+                </div>
+                <div class="trajectory-step ${signal.trajectory === 'alignment' ? 'active' : ''}">
+                  <div class="bar"></div>
+                </div>
+                <div class="trajectory-step ${signal.trajectory === 'exposure' ? 'active' : ''}">
+                  <div class="bar"></div>
+                </div>
+              </div>
+              <div class="trajectory-labels">
+                <div class="trajectory-label-item ${signal.trajectory === 'early' ? 'active' : ''}">
+                  <span class="label-text">Early signals</span>
+                  ${signal.trajectory === 'early' ? '<span class="current-marker">CURRENT</span>' : ''}
+                </div>
+                <div class="trajectory-label-item ${signal.trajectory === 'detected' ? 'active' : ''}">
+                  <span class="label-text">Detected</span>
+                  ${signal.trajectory === 'detected' ? '<span class="current-marker">CURRENT</span>' : ''}
+                </div>
+                <div class="trajectory-label-item ${signal.trajectory === 'alignment' ? 'active' : ''}">
+                  <span class="label-text">Alignment</span>
+                  ${signal.trajectory === 'alignment' ? '<span class="current-marker">CURRENT</span>' : ''}
+                </div>
+                <div class="trajectory-label-item ${signal.trajectory === 'exposure' ? 'active' : ''}">
+                  <span class="label-text">Exposure<br>window</span>
+                  ${signal.trajectory === 'exposure' ? '<span class="current-marker">CURRENT</span>' : ''}
                 </div>
               </div>
             </div>
           </div>
-        `).join('');
-      });
+        </div>
+      `).join('');
     }
 
     // Admin controls
@@ -1665,52 +1754,41 @@
       }
     }
 
-    // Filter category mapping
-    const filterCategories = {
-      'legal': 'Legal & Regulatory Signals',
-      'cyber': 'Cyber & Network Anomalies',
-      'financial': 'Financial Stress Indicators',
-      'corporate': 'Corporate & Third-Party Behavior',
-      'openweb': 'Open-Web & Reputational Precursors',
-      'all': null  // Show all
+    // Map each view to its data source and grid ID
+    const layerConfig = {
+      signalIntelligenceView: { data: signalIntelligenceData, gridId: 'signalsGrid' },
+      correlationEngineView: { data: correlationData, gridId: 'correlationSignals' },
+      exposureWindowView: { data: exposureWindowData, gridId: 'exposureSignals' },
+      decisionAccessView: { data: decisionAccessData, gridId: 'decisionSignals' }
     };
 
-    let currentFilter = 'all';
-
-    // Filter pill handling
+    // Filter pill handling — layer-aware
     document.querySelectorAll('.filter-pill').forEach(pill => {
       pill.addEventListener('click', function() {
+        if (this.classList.contains('disabled')) return;
+
         const parent = this.closest('.filter-pills');
         parent.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
         this.classList.add('active');
 
-        // Get filter from data attribute or text content
         const filterKey = this.dataset.filter || 'all';
-        currentFilter = filterKey;
 
-        // Filter and render signals
-        filterSignals(filterKey);
+        // Find which layer view this pill belongs to
+        const viewEl = this.closest('.view');
+        if (!viewEl) return;
+        const viewId = viewEl.id;
+        const config = layerConfig[viewId];
+        if (!config) return;
+
+        if (filterKey === 'all') {
+          renderGrid(config.gridId, getAllLayerSignals(config.data));
+        } else if (config.data[filterKey]) {
+          renderGrid(config.gridId, config.data[filterKey]);
+        } else {
+          renderGrid(config.gridId, getAllLayerSignals(config.data));
+        }
       });
     });
-
-    function filterSignals(filterKey) {
-      const categoryName = filterCategories[filterKey];
-      let filtered;
-
-      if (!categoryName) {
-        // Show all
-        filtered = cachedSignals;
-      } else {
-        filtered = cachedSignals.filter(s => s.category === categoryName);
-      }
-
-      // If no matches, show all with a message
-      if (filtered.length === 0) {
-        filtered = cachedSignals;
-      }
-
-      renderSignals(filtered);
-    }
 
     // Update the date display to current date
     function updateCurrentDate() {
