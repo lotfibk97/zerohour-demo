@@ -1551,9 +1551,9 @@
     async function loadDashboard() {
       // Update date
       const now = new Date();
-      document.getElementById('signalDate').textContent = now.toLocaleDateString('en-GB', {
-        day: '2-digit',
+      document.getElementById('signalDate').textContent = now.toLocaleDateString('en-US', {
         month: 'short',
+        day: '2-digit',
         year: 'numeric'
       });
 
@@ -1795,9 +1795,9 @@
       const now = new Date();
       const dateEl = document.getElementById('signalDate');
       if (dateEl) {
-        dateEl.textContent = now.toLocaleDateString('en-GB', {
-          day: '2-digit',
+        dateEl.textContent = now.toLocaleDateString('en-US', {
           month: 'short',
+          day: '2-digit',
           year: 'numeric'
         });
       }
